@@ -11,16 +11,17 @@ import org.json.simple.parser.ParseException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-        String jsonFilePath = "C:\\Users\\andre\\Desktop\\tables\\tables.json";
         JsonDecoder jsondecoder = new JsonDecoder();
         try {
-            InputStream inputStream = Files.newInputStream(Path.of(jsonFilePath));
-            List<Object> arrayObjects = jsondecoder.readJsonStream(inputStream);
+            InputStream inputStream = Files.newInputStream(Paths.get("tables.json"));
+            jsondecoder.readJsonStream(inputStream);
+
             System.out.println();
         }catch (Exception e ){
             System.out.println("Eccezione");
