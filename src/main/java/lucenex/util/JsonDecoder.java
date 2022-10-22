@@ -1,12 +1,15 @@
 package lucenex.util;
 
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import org.apache.lucene.queryparser.flexible.messages.Message;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JsonDecoder {
 
@@ -43,6 +46,80 @@ public class JsonDecoder {
 //            System.out.println("position: " + pe.getPosition());
 //            System.out.println(pe);
 //        }
+//    }
+
+    public List<Object> readJsonStream(InputStream in) throws IOException {
+        JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
+        try {
+            return readMessagesArray(reader);
+        } finally {
+            reader.close();
+        }
+    }
+
+    public List<Object> readMessagesArray(JsonReader reader) throws IOException {
+        List<Object> messages = new ArrayList<Object>();
+
+        reader.beginArray();
+        while (reader.hasNext()) {
+            readMessage(reader);
+        }
+        reader.endArray();
+        return messages;
+    }
+
+    public void readMessage(JsonReader reader) throws IOException {
+        long id = -1;
+        String text = null;
+//        User user = null;
+        List<Double> geo = null;
+
+        reader.beginObject();
+        while (reader.hasNext()) {
+            String name = reader.nextName();
+            if (name.equals("id")) {
+                id = reader.nextLong();
+            } else if (name.equals("text")) {
+                text = reader.nextString();
+            } else if (name.equals("geo") && reader.peek() != JsonToken.NULL) {
+                geo = readDoublesArray(reader);
+            } else if (name.equals("user")) {
+//                user = readUser(reader);
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endObject();
+    }
+
+    public List<Double> readDoublesArray(JsonReader reader) throws IOException {
+        List<Double> doubles = new ArrayList<Double>();
+
+        reader.beginArray();
+        while (reader.hasNext()) {
+            doubles.add(reader.nextDouble());
+        }
+        reader.endArray();
+        return doubles;
+    }
+
+//    public User readUser(JsonReader reader) throws IOException {
+//        String username = null;
+//        int followersCount = -1;
+//
+//        reader.beginObject();
+//        while (reader.hasNext()) {
+//            String name = reader.nextName();
+//            if (name.equals("name")) {
+//                username = reader.nextString();
+//            } else if (name.equals("followers_count")) {
+//                followersCount = reader.nextInt();
+//            } else {
+//                reader.skipValue();
+//            }
+//        }
+//        reader.endObject();
+//        return new User(username, followersCount);
 //    }
 
     public JSONArray parseJSONFile(String jsonFilePath) throws FileNotFoundException {
