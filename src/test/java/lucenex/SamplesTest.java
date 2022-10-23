@@ -1,6 +1,7 @@
 package lucenex;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import lucenex.index.JSONIndexer;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenStream;
@@ -296,6 +298,12 @@ public class SamplesTest {
         StringWriter w = new StringWriter();
         new TokenStreamToDot(null, ts, new PrintWriter(w)).toDot();
         System.out.println(w);
+    }
+    @Test
+    public void testDecoder() throws Exception {
+        JSONIndexer JSONIndexer = new JSONIndexer();
+        InputStream inputStream = Files.newInputStream(Paths.get("tables.json"));
+        JSONIndexer.readJsonStream(inputStream);
     }
 
 }
