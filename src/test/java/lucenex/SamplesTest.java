@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lucenex.index.JSONIndexer;
+import lucenex.query.QueryManager;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenStream;
@@ -301,7 +302,6 @@ public class SamplesTest {
     }
     @Test
     public void testDecoder() throws Exception {
-        JSONIndexer JSONIndexer = new JSONIndexer();
         InputStream inputStream = Files.newInputStream(Paths.get("tables.json"));
         JSONIndexer.readJsonStream(inputStream);
     }
