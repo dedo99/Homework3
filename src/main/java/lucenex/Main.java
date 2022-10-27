@@ -14,7 +14,7 @@ public class Main {
         try {
             InputStream inputStream = Files.newInputStream(Paths.get("tables.json"));
             JSONIndexer.readJsonStream(inputStream);
-            Map<String, Integer> result = QueryManager.mergeList(4, new String[]{"1966", "1963"});
+            Map<String, Integer> result = QueryManager.mergeList(4, new String[]{"ina shan", "1963"});
             for(String s : result.keySet()) {
                 System.out.println(s + " -> " + result.get(s));
             }

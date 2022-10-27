@@ -2,11 +2,15 @@ package lucenex.index;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+
+
 import lucenex.model.Cell;
 import lucenex.model.JSONObject;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.custom.CustomAnalyzer;
+import org.apache.lucene.analysis.pattern.PatternTokenizerFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.simpletext.SimpleTextCodec;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -42,13 +46,21 @@ public class JSONIndexer {
         Directory indexDir = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
         Map<String, String> colonnaXvalori = new HashMap<>();
         Gson gson = new Gson();
-        Analyzer analyzer = new StandardAnalyzer();
+        Analyzer analyzer = CustomAnalyzer.builder()
+                .withTokenizer(PatternTokenizerFactory.NAME, "pattern", "~", "group", "-1")
+                .build();
 
         IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-        // iwc.setCodec(new SimpleTextCodec());
+        Codec codec = new SimpleTextCodec();
+        if (codec != null) {
+            iwc.setCodec(codec);
+        }
 
         IndexWriter indexWriter = new IndexWriter(indexDir, iwc);
         indexWriter.deleteAll();
+
+        //acquisizione istante di tempo iniziale
+        long startTime = System.nanoTime();
 
         JSONObject obj = gson.fromJson(reader, JSONObject.class);
 
@@ -78,12 +90,24 @@ public class JSONIndexer {
                 // end of file
                 break;
             }
+            System.out.println(i);
+
             if(i == 100)
                 break;
         }
 
+
+
         indexWriter.commit();
         indexWriter.close();
+
+        //acquisizione istante di tempo finale
+        long endTime = System.nanoTime();
+        // ottiene la differenza tra i due valori di tempo
+        long timeElapsed = endTime - startTime;
+        //stampe
+        System.out.println("Number of documents indexed: " + i);
+        System.out.println("Execution time in milliseconds: " + timeElapsed / 1000000);
 
     }
 
