@@ -36,13 +36,13 @@ public class JSONIndexer {
     private static final String INDEX_DIRECTORY = "index";
 
 
-    public static void readJsonStream(InputStream in) throws IOException {
+    public static void readJsonStream(InputStream in, Codec codec) throws IOException {
         try (JsonReader reader = new JsonReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-            indexJSONStream(reader);
+            indexJSONStream(reader, codec);
         }
     }
 
-    public static void indexJSONStream(JsonReader reader) throws IOException {
+    public static void indexJSONStream(JsonReader reader, Codec codec) throws IOException {
         Directory indexDir = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
         Map<String, String> colonnaXvalori = new HashMap<>();
         Gson gson = new Gson();
@@ -51,7 +51,6 @@ public class JSONIndexer {
                 .build();
 
         IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-        Codec codec = new SimpleTextCodec();
         if (codec != null) {
             iwc.setCodec(codec);
         }
@@ -67,6 +66,7 @@ public class JSONIndexer {
         int i = 0;
 
         while(obj != null) {
+            colonnaXvalori.clear();
             for(Cell c : obj.getCells())
                 if (!c.getHeader()) {
                     if(colonnaXvalori.containsKey(obj.getId() + "_" + c.getCoordinates().getColumn().toString())) {
@@ -76,27 +76,28 @@ public class JSONIndexer {
                         colonnaXvalori.put(obj.getId() + "_" + c.getCoordinates().getColumn().toString(), c.getCleanedText());
                 }
 
+
             for(String k : colonnaXvalori.keySet()) {
+                i++;
                 Document doc = new Document();
                 doc.add(new StringField("id", k, Field.Store.YES));
                 doc.add(new TextField("value", colonnaXvalori.get(k), Field.Store.YES));
-                indexWriter.addDocument(doc);
+                System.out.println(i);
+                try {
+                    indexWriter.addDocument(doc);
+                } catch (IOException e) {
+                    logger.severe("Exception while inserting document");
+                    logger.severe(e.getMessage());
+                }
             }
 
-            i++;
             try {
                 obj = gson.fromJson(reader, JSONObject.class);
             } catch (Exception e) {
                 // end of file
                 break;
             }
-            System.out.println(i);
-
-            if(i == 100)
-                break;
         }
-
-
 
         indexWriter.commit();
         indexWriter.close();
@@ -110,7 +111,6 @@ public class JSONIndexer {
         System.out.println("Execution time in milliseconds: " + timeElapsed / 1000000);
 
     }
-
 
 
 }

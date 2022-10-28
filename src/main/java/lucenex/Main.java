@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             InputStream inputStream = Files.newInputStream(Paths.get("tables.json"));
-            JSONIndexer.readJsonStream(inputStream);
+            JSONIndexer.readJsonStream(inputStream, null);
             Map<String, Integer> result = QueryManager.mergeList(4, new String[]{"ina shan", "1963"});
             for(String s : result.keySet()) {
                 System.out.println(s + " -> " + result.get(s));

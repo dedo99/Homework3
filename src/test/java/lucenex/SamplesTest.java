@@ -303,7 +303,7 @@ public class SamplesTest {
     @Test
     public void testDecoder() throws Exception {
         InputStream inputStream = Files.newInputStream(Paths.get("tables.json"));
-        JSONIndexer.readJsonStream(inputStream);
+        JSONIndexer.readJsonStream(inputStream, null);
     }
 
 }
