@@ -20,6 +20,7 @@ public class QueryManager {
     private Map<String, Integer> set2count;
 
     public static Map<String, Integer> mergeList(int n, String[] queryString) {
+        long startTime = System.nanoTime();
         Map<String, Integer> queryResult = executeQuery("value", queryString);
         Map<String, Integer> result = new HashMap<>();
         int i = 0;
@@ -28,6 +29,11 @@ public class QueryManager {
             result.put(s, queryResult.get(s));
             i++;
         }
+
+        long endTime = System.nanoTime();
+        long timeElapsed = endTime - startTime;
+        int div_for_milli = 1000000;
+        System.out.println("Execution time in milliseconds for query: " + timeElapsed / div_for_milli);
 
         return sortMapByValues(result);
     }

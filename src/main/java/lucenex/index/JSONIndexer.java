@@ -63,10 +63,12 @@ public class JSONIndexer {
 
         JSONObject obj = gson.fromJson(reader, JSONObject.class);
 
-        int i = 0;
+        int num_table_index = 0;
+        int num_col_index = 0;
 
         while(obj != null) {
             colonnaXvalori.clear();
+            num_table_index++;
             for(Cell c : obj.getCells())
                 if (!c.getHeader()) {
                     if(colonnaXvalori.containsKey(obj.getId() + "_" + c.getCoordinates().getColumn().toString())) {
@@ -78,11 +80,11 @@ public class JSONIndexer {
 
 
             for(String k : colonnaXvalori.keySet()) {
-                i++;
+                num_col_index++;
                 Document doc = new Document();
                 doc.add(new StringField("id", k, Field.Store.YES));
                 doc.add(new TextField("value", colonnaXvalori.get(k), Field.Store.YES));
-                System.out.println(i);
+                System.out.println(num_col_index);
                 try {
                     indexWriter.addDocument(doc);
                 } catch (IOException e) {
@@ -107,8 +109,10 @@ public class JSONIndexer {
         // ottiene la differenza tra i due valori di tempo
         long timeElapsed = endTime - startTime;
         //stampe
-        System.out.println("Number of documents indexed: " + i);
-        System.out.println("Execution time in milliseconds: " + timeElapsed / 1000000);
+        System.out.println("Number of tables indexed: " + num_table_index);
+        System.out.println("Number of documents indexed: " + num_col_index);
+        int div_for_milli = 1000000;
+        System.out.println("Execution time in milliseconds for index: " + timeElapsed / div_for_milli);
 
     }
 
