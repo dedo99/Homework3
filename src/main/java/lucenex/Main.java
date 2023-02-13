@@ -17,7 +17,7 @@ public class Main {
             InputStream inputStream = Files.newInputStream(Paths.get("tables.json"));
             JSONIndexer.readJsonStream(inputStream, new SimpleTextCodec());
 //            Map<String, Integer> result = QueryManager.mergeList(4, new String[]{"Ajax", "Napoli", "Alcaraz", "Rangers"});
-            Map<String, Integer> result = QueryManager.mergeList(4, new String[]{"ina shan", "1963"});
+            Map<String, Integer> result = QueryManager.mergeList(4, new String[]{"singular", "plural", "fmou", "dual"});
             System.out.println("-----------------RISULTATI-----------------");
             for(String s : result.keySet()) {
                 System.out.println(s + " -> " + result.get(s));
