@@ -19,7 +19,7 @@ public class QueryManager {
 
     private Map<String, Integer> set2count;
 
-    public static Map<String, Integer> mergeList(int n, String[] queryString) {
+    public static Map<String, Integer> mergeList(int n, List<String> queryString) {
         long startTime = System.nanoTime();
         Map<String, Integer> queryResult = executeQuery("value", queryString);
         Map<String, Integer> result = new HashMap<>();
@@ -38,11 +38,13 @@ public class QueryManager {
         return sortMapByValues(result);
     }
 
-    public static Map<String, Integer> executeQuery(String field, String[] queryString) {
+    public static Map<String, Integer> executeQuery(String field, List<String> queryString) {
         Map<String, Integer> columnsXcount = new HashMap<>();
         try {
             for(String s : queryString) {
                 TermQuery termQuery = new TermQuery(new Term(field, s));
+
+                System.out.println(s);
 
                 try (Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY))) {
                     try (IndexReader reader = DirectoryReader.open(directory)) {
