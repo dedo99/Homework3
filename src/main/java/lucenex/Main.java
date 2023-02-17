@@ -2,6 +2,7 @@ package lucenex;
 
 import lucenex.index.JSONIndexer;
 //import lucenex.model.JSONObject;
+import lucenex.model.TestObject;
 import lucenex.query.QueryManager;
 import org.apache.lucene.codecs.simpletext.SimpleTextCodec;
 import org.json.simple.JSONArray;
@@ -12,33 +13,32 @@ import org.json.simple.parser.ParseException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
 //            List<String> lista_nomi = read_csv();
-            List <String> lista_query = read_json_query();
+            Map<String, TestObject> maptoObj = read_json_query();
 //            InputStream inputStream = Files.newInputStream(Paths.get("sample.json"));
 //            InputStream inputStream = Files.newInputStream(Paths.get("tables.json"));
-            InputStream inputStream = Files.newInputStream(Paths.get("tables_test.json"));
+            InputStream inputStream = Files.newInputStream(Paths.get("tables_test_finale.json"));
 
             JSONIndexer.readJsonStream(inputStream, null);
 //            Map<String, Integer> result = QueryManager.mergeList(4, new String[]{"Ajax", "Napoli", "Alcaraz", "Rangers"});
-            Map<String, Integer> result = QueryManager.mergeList(10, lista_query);
-            System.out.println("-----------------RISULTATI-----------------");
-            for(String s : result.keySet()) {
-                System.out.println(s + " -> " + result.get(s));
+            for (String key : maptoObj.keySet()){
+                Map<String, Integer> result = QueryManager.mergeList(5, maptoObj.get(key).getQuery());
+                System.out.println("-----------------RISULTATI " + key +" -----------------");
+                for(String s : result.keySet()) {
+                    System.out.println(s + " -> " + result.get(s));
+                }
+                System.out.println("Top 5 previste " + key +" :" + maptoObj.get(key).getTop5());
             }
         }catch (Exception e ){
             System.out.println("Eccezione");
             System.out.println(e.getMessage());
         }
-
     }
 
     public static List<String> read_csv(){
@@ -65,28 +65,38 @@ public class Main {
         return lista_nomi;
     }
 
-    public static List<String> read_json_query() {
+    public static Map<String, TestObject> read_json_query() {
 
         JSONParser parser = new JSONParser();
-        List<String> lista_query = new ArrayList();
+        Map<String, TestObject> maptoObj = new HashMap<>();
 
         try {
-            JSONArray a = (JSONArray) parser.parse(new FileReader("queries_test.json"));
+            int i = 1;
+            JSONArray a = (JSONArray) parser.parse(new FileReader("queries_test_finale_prova.json"));
             for (Object o : a)
             {
+                TestObject testObject = new TestObject();
+
                 JSONObject jsonObject = (JSONObject) o;
 
+                List<String> lista_query = new ArrayList();
                 // loop array
                 JSONArray query = (JSONArray) jsonObject.get("query");
                 for (Object c : query){
-                    System.out.println(c+"");
+//                    System.out.println(c+"");
                     lista_query.add((String) c);
                 }
+                testObject.setQuery(lista_query);
+
+                List<String> lista_top = new ArrayList();
                 JSONArray top_5 = (JSONArray) jsonObject.get("top_5");
                 for (Object c : top_5){
-                    System.out.println(c+"");
-                    lista_query.add((String) c);
+//                    System.out.println(c+"");
+                    lista_top.add((String) c);
                 }
+                testObject.setTop5(lista_top);
+                maptoObj.put("query"+i, testObject);
+                i++;
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -95,7 +105,7 @@ public class Main {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return lista_query;
+        return maptoObj;
     }
 
 

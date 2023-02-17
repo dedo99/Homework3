@@ -44,8 +44,6 @@ public class QueryManager {
             for(String s : queryString) {
                 TermQuery termQuery = new TermQuery(new Term(field, s));
 
-                System.out.println(s);
-
                 try (Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY))) {
                     try (IndexReader reader = DirectoryReader.open(directory)) {
                         IndexSearcher searcher = new IndexSearcher(reader);
