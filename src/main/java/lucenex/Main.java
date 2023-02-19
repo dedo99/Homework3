@@ -32,7 +32,7 @@ public class Main {
 //            Map<String, Integer> result = QueryManager.mergeList(4, new String[]{"Ajax", "Napoli", "Alcaraz", "Rangers"});
             ListResultQuery list_resultquery = new ListResultQuery();
             for (String key : maptoObj.keySet()){
-                Map<String, Integer> result = QueryManager.mergeList(10, maptoObj.get(key).getQuery());
+                Map<String, Integer> result = QueryManager.mergeList(5, maptoObj.get(key).getQuery());
                 ResultQuery resultQuery = new ResultQuery(key);
                 System.out.println("-----------------RISULTATI " + key +" -----------------");
                 for(String s : result.keySet()) {
